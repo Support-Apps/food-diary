@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>יומן תזונה - מובייל</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #ffeef8 0%, #fffbf5 100%);
+            min-height: 100vh;
+            padding: 10px;
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 20px 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 20px rgba(255, 182, 193, 0.15);
+            text-align: center;
+        }
+
+        h1 {
+            color: #ffb3c7;
+            font-size: 1.5em;
+            margin-bottom: 8px;
+        }
+
+        .date-display {
+            color: #9b8574;
+            font-size: 0.9em;
+            margin-bottom: 12px;
+        }
+
+        .inspiration-quote {
+            background: linear-gradient(135deg, #ffe5f0 0%, #fff9f5 100%);
+            padding: 12px;
+            border-radius: 10px;
+            margin: 12px 0;
+            font-style: italic;
+            color: #9b8574;
+            border-right: 3px solid #daa520;
+            font-size: 0.85em;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            margin-bottom: 15px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #ffe5f0 0%, #fff9f5 100%);
+            color: #8b7355;
+            padding: 10px 5px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(255, 182, 193, 0.15);
+        }
+
+        .stat-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin: 3px 0;
+            color: #ffb3c7;
+            line-height: 1.2;
+            transition: all 0.3s ease;
+        }
+
+        .stat-value.updated {
+            animation: pulse 0.5s ease;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); color: #daa520; }
+            100% { transform: scale(1); }
+        }
+
+        .stat-label {
+            font-size: 0.65em;
+            opacity: 0.9;
+            color: #9b8574;
+            line-height: 1.2;
+        }
+
+        .water-section {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 20px rgba(255, 182, 193, 0.15);
+        }
+
+        .water-section h2 {
+            color: #ffb3c7;
+            margin-bottom: 12px;
+            font-size: 1.2em;
+        }
+
+        .water-tracker {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 12px 0;
+        }
+
+        .water-glass {
+            width: 35px;
+            height: 50px;
+            background: #fff;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px 5px 12px 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .water-glass.filled {
+            border-color: #89CFF0;
+        }
+
+        .water-glass.filled::before {
+            content: '💧';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.2em;
+        }
+
+        .water-counter {
+            text-align: center;
+            font-size: 1em;
+            color: #9b8574;
+            margin-top: 10px;
+        }
+
+        .water-goal {
+            text-align: center;
+            margin-top: 8px;
+            color: #9b8574;
+            font-size: 0.85em;
+        }
+
+        .btn-water {
+            background: linear-gradient(135deg, #89CFF0 0%, #a8daff 100%);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.85em;
+            cursor: pointer;
+            width: calc(33.33% - 4px);
+            margin: 5px 2px;
+            font-weight: bold;
+        }
+
+        .goals-section {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 5px 20px rgba(255, 182, 193, 0.15);
+            margin-bottom: 15px;
+        }
+
+        .goals-section h2 {
+            color: #ffb3c7;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ffe5f0;
+            font-size: 1.2em;
+        }
+
+        .goal-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 12px;
+            background: linear-gradient(135deg, #fff9f5 0%, white 100%);
+            border-radius: 10px;
+            font-size: 0.9em;
+        }
+
+        .goal-item label {
+            color: #9b8574;
+            font-weight: 600;
+        }
+
+        .goal-item input {
+            width: 80px;
+            padding: 8px;
+            border: 2px solid #ffe5f0;
+            border-radius: 8px;
+            font-size: 0.95em;
+            text-align: center;
+        }
+
+        .goals-macros {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .macro-goal {
+            background: linear-gradient(135deg, #fff9f5 0%, white 100%);
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .macro-goal label {
+            display: block;
+            margin-bottom: 6px;
+            color: #9b8574;
+            font-size: 0.75em;
+            font-weight: 600;
+        }
+
+        .macro-goal input {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #ffe5f0;
+            border-radius: 8px;
+            font-size: 0.9em;
+            text-align: center;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 5px 20px rgba(255, 182, 193, 0.15);
+            margin-bottom: 15px;
+        }
+
+        .card h2 {
+            color: #ffb3c7;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ffe5f0;
+        }
+
+        .input-group {
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #9b8574;
+            font-weight: 600;
+            font-size: 0.85em;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ffe5f0;
+            border-radius: 10px;
+            font-size: 0.95em;
+            font-family: inherit;
+            background: white;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #ffb3c7;
+            box-shadow: 0 0 0 3px rgba(255, 179, 199, 0.1);
+        }
+
+        .nutrition-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .nutrition-input {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nutrition-input label {
+            font-size: 0.75em;
+            margin-bottom: 4px;
+        }
+
+        .nutrition-input input {
+            padding: 8px;
+            font-size: 0.9em;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #ffb3c7 0%, #ffc8d6 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 12px;
+            font-size: 1em;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            box-shadow: 0 3px 12px rgba(255, 179, 199, 0.3);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .tab {
+            padding: 10px 15px;
+            background: #ffe5f0;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.85em;
+            color: #9b8574;
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #ffb3c7 0%, #ffc8d6 100%);
+            color: white;
+            box-shadow: 0 2px 10px rgba(255, 179, 199, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .meal-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .meal-item {
+            background: linear-gradient(135deg, #fff9f5 0%, #fffbf5 100%);
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 10px rgba(255, 182, 193, 0.1);
+        }
+
+        .meal-type-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75em;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        .breakfast { background: #fff4e6; color: #c4a57b; }
+        .lunch { background: #ffe5f0; color: #ffb3c7; }
+        .dinner { background: #ffeef8; color: #e6a4c4; }
+        .snack { background: #fffbf5; color: #daa520; }
+
+        .meal-time {
+            color: #ffb3c7;
+            font-weight: bold;
+            font-size: 0.8em;
+            margin-bottom: 6px;
+        }
+
+        .meal-item h3 {
+            color: #9b8574;
+            margin-bottom: 8px;
+            font-size: 1em;
+        }
+
+        .meal-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            font-size: 0.8em;
+            color: #9b8574;
+            padding-top: 8px;
+            border-top: 1px solid #ffe5f0;
+        }
+
+        .delete-btn {
+            background: linear-gradient(135deg, #ffc8d6 0%, #ffd4e5 100%);
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85em;
+            margin-top: 8px;
+            width: 48%;
+            display: inline-block;
+            margin-left: 2%;
+        }
+
+        .edit-btn {
+            background: linear-gradient(135deg, #ffc8d6 0%, #ffd4e5 100%);
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85em;
+            margin-top: 8px;
+            width: 48%;
+            display: inline-block;
+            margin-right: 2%;
+        }
+
+        .meal-buttons {
+            display: flex;
+            gap: 4%;
+            margin-top: 8px;
+        }
+
+        .meal-buttons button {
+            flex: 1;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px 15px;
+            color: #c4a57b;
+        }
+
+        .empty-state-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .history-view {
+            display: none;
+        }
+
+        .history-view.active {
+            display: block;
+        }
+
+        .history-table {
+            font-size: 0.85em;
+        }
+
+        .history-table tbody tr {
+            margin-bottom: 12px;
+            border: 2px solid #ffe5f0;
+            border-radius: 10px;
+            padding: 12px;
+            background: white;
+            display: block;
+        }
+
+        .history-table tbody tr.summary-row {
+            background: linear-gradient(135deg, #ffe5f0 0%, #fff9f5 100%);
+            border-color: #ffb3c7;
+            margin-top: 10px;
+        }
+
+        .history-table thead {
+            display: none;
+        }
+
+        .history-table td {
+            text-align: right;
+            padding: 6px 8px;
+            border: none;
+            display: inline-block;
+            width: 48%;
+            vertical-align: top;
+            margin-bottom: 4px;
+        }
+
+        .history-table td::before {
+            content: attr(data-label);
+            font-weight: 600;
+            color: #ffb3c7;
+            margin-left: 8px;
+            display: inline;
+        }
+
+        .history-table td:first-child {
+            font-size: 1em;
+            font-weight: bold;
+            text-align: center;
+            width: 100%;
+            display: block;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #ffe5f0;
+        }
+
+        .history-table td:first-child::before {
+            display: none;
+        }
+
+        .date-cell {
+            color: #ffb3c7;
+        }
+
+        .water-cell {
+            color: #89CFF0;
+            font-weight: 600;
+        }
+
+        .macro-breakdown {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .macro-item {
+            text-align: center;
+            padding: 12px;
+            background: linear-gradient(135deg, #fff9f5 0%, #fffbf5 100%);
+            border-radius: 10px;
+        }
+
+        .macro-item h4 {
+            color: #ffb3c7;
+            margin-bottom: 5px;
+            font-size: 0.85em;
+        }
+
+        .macro-item .value {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #9b8574;
+        }
+
+        .gold-accent {
+            color: #daa520;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 יומן תזונה</h1>
+            <div class="date-display" id="dateDisplay"></div>
+            
+            <div class="inspiration-quote" id="inspirationQuote">
+                "כל יום הוא הזדמנות חדשה ✨"
+            </div>
+            
+            <div style="text-align: center; color: #9b8574; font-size: 0.8em; margin-bottom: 8px; font-weight: 600;">
+                📊 סיכום היום
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">קלוריות<br>&nbsp;</div>
+                    <div class="stat-value" id="totalCalories">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">חלבון<br>(גרם)</div>
+                    <div class="stat-value" id="totalProtein">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">פחמימות<br>(גרם)</div>
+                    <div class="stat-value" id="totalCarbs">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">שומן<br>(גרם)</div>
+                    <div class="stat-value" id="totalFat">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="water-section">
+            <h2>💧 מעקב שתייה</h2>
+            <div class="water-tracker" id="waterTracker"></div>
+            <div class="water-counter">
+                <span id="waterCount">0</span> / <span id="waterGoalDisplay">8</span> כוסות
+            </div>
+            <div class="water-goal">
+                <span class="gold-accent">🎯</span> 
+                <input type="number" id="waterGoalInput" value="8" min="1" max="20" 
+                       style="width: 50px; display: inline-block; padding: 4px; border-radius: 5px; border: 1px solid #ffe5f0; font-size: 0.9em;"
+                       onchange="updateWaterGoal()"> כוסות
+            </div>
+            <div style="text-align: center; margin-top: 10px;">
+                <button class="btn-water" onclick="addWater()">➕</button>
+                <button class="btn-water" onclick="removeWater()">➖</button>
+                <button class="btn-water" onclick="resetWater()">🔄</button>
+            </div>
+        </div>
+
+        <div class="goals-section">
+            <h2>🎯 המטרות שלי</h2>
+            <div class="goal-item">
+                <label for="calorieGoal">יעד קלוריות יומי:</label>
+                <input type="number" id="calorieGoal" value="2000" onchange="saveGoals()">
+            </div>
+            <div class="goal-item">
+                <label for="weightGoal">משקל יעד (ק"ג):</label>
+                <input type="number" id="weightGoal" step="0.1" onchange="saveGoals()">
+            </div>
+            <div class="goals-macros">
+                <div class="macro-goal">
+                    <label for="proteinGoal">חלבון (g)</label>
+                    <input type="number" id="proteinGoal" value="150" onchange="saveGoals()">
+                </div>
+                <div class="macro-goal">
+                    <label for="carbsGoal">פחמימות (g)</label>
+                    <input type="number" id="carbsGoal" value="200" onchange="saveGoals()">
+                </div>
+                <div class="macro-goal">
+                    <label for="fatGoal">שומן (g)</label>
+                    <input type="number" id="fatGoal" value="65" onchange="saveGoals()">
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>➕ הוספת ארוחה</h2>
+            <div class="input-group">
+                <label>סוג ארוחה</label>
+                <select id="mealType">
+                    <option value="breakfast">ארוחת בוקר</option>
+                    <option value="lunch">ארוחת צהריים</option>
+                    <option value="dinner">ארוחת ערב</option>
+                    <option value="snack">חטיף</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>שם המנה</label>
+                <input type="text" id="mealName" placeholder="לדוגמה: סלט יווני">
+            </div>
+            <div style="margin-bottom: 8px;">
+                <label style="color: #ffb3c7; font-weight: bold; font-size: 0.9em;">🔢 ערכים תזונתיים של הארוחה:</label>
+            </div>
+            <div class="nutrition-grid">
+                <div class="nutrition-input">
+                    <label>קלוריות</label>
+                    <input type="number" step="0.1" id="calories" placeholder="0">
+                </div>
+                <div class="nutrition-input">
+                    <label>חלבון (גרם)</label>
+                    <input type="number" step="0.1" id="protein" placeholder="0">
+                </div>
+                <div class="nutrition-input">
+                    <label>פחמימות (גרם)</label>
+                    <input type="number" step="0.1" id="carbs" placeholder="0">
+                </div>
+                <div class="nutrition-input">
+                    <label>שומן (גרם)</label>
+                    <input type="number" step="0.1" id="fat" placeholder="0">
+                </div>
+            </div>
+            <div class="input-group">
+                <label>הערות</label>
+                <input type="text" id="notes" placeholder="פרטים נוספים...">
+            </div>
+            <button class="btn" onclick="addMeal()">הוסף ארוחה 🍽️</button>
+        </div>
+
+        <div class="card">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('today')">היום</button>
+                <button class="tab" onclick="switchTab('history')">היסטוריה</button>
+            </div>
+
+            <div id="todayTab" class="tab-content active">
+                <h2>📋 ארוחות היום</h2>
+                <div class="meal-list" id="mealList">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🍽️</div>
+                        <p>עדיין לא הוספת ארוחות</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="historyTab" class="tab-content">
+                <div class="tabs" style="margin-bottom: 15px;">
+                    <button class="tab active" onclick="switchHistoryView('date')">לפי תאריך</button>
+                    <button class="tab" onclick="switchHistoryView('table')">טבלה</button>
+                </div>
+
+                <div id="dateHistoryView" class="history-view active">
+                    <h2>📅 היסטוריה</h2>
+                    <div class="input-group">
+                        <label>בחר תאריך</label>
+                        <input type="date" id="historyDate" onchange="loadHistory()">
+                    </div>
+                    <div class="meal-list" id="historyList">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📅</div>
+                            <p>בחר תאריך</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tableHistoryView" class="history-view">
+                    <h2>📊 כל הנתונים</h2>
+                    <div style="margin-top: 15px;">
+                        <table class="history-table" id="fullHistoryTable">
+                            <thead>
+                                <tr>
+                                    <th>תאריך</th>
+                                    <th>קלוריות</th>
+                                    <th>חלבון</th>
+                                    <th>פחמימות</th>
+                                    <th>שומן</th>
+                                    <th>כוסות מים</th>
+                                    <th>ארוחות</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTableBody">
+                                <tr>
+                                    <td colspan="7" style="text-align: center; padding: 30px;">
+                                        <div style="font-size: 2em;">📊</div>
+                                        <div>טרם נרשמו נתונים</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const quotes = [
+            "כל יום הוא הזדמנות חדשה ✨",
+            "אכילה בריאה = אהבה עצמית 💕",
+            "התקדמות קטנה כל יום 🌟",
+            "את/ה חזק/ה יותר ממה שחושב/ת 💪",
+            "כל ארוחה היא בחירה 🌈",
+            "דאג/י לגוף שלך 🏡",
+            "התקדמות, לא שלמות 🌺",
+            "היום הוא מתנה 🎁",
+            "השקעה בעצמך 💎",
+            "בחר/י בחוכמה 🍃"
+        ];
+
+        let meals = {};
+        let goals = {
+            calories: 2000,
+            protein: 150,
+            carbs: 200,
+            fat: 65,
+            weight: null
+        };
+        let waterData = {};
+        let waterGoal = 8;
+
+        function displayRandomQuote() {
+            const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+            document.getElementById('inspirationQuote').textContent = randomQuote;
+        }
+
+        function initWaterTracker() {
+            const today = getTodayString();
+            if (!waterData[today]) {
+                waterData[today] = 0;
+            }
+            renderWaterGlasses();
+            updateWaterCounter();
+        }
+
+        function renderWaterGlasses() {
+            const tracker = document.getElementById('waterTracker');
+            const today = getTodayString();
+            const currentCount = waterData[today] || 0;
+            
+            let html = '';
+            for (let i = 0; i < waterGoal; i++) {
+                const filled = i < currentCount ? 'filled' : '';
+                html += `<div class="water-glass ${filled}" onclick="toggleWater(${i})"></div>`;
+            }
+            tracker.innerHTML = html;
+        }
+
+        function toggleWater(index) {
+            const today = getTodayString();
+            if (index < waterData[today]) {
+                waterData[today] = index;
+            } else {
+                waterData[today] = index + 1;
+            }
+            saveWaterData();
+            renderWaterGlasses();
+            updateWaterCounter();
+        }
+
+        function addWater() {
+            const today = getTodayString();
+            if (waterData[today] < waterGoal) {
+                waterData[today]++;
+                saveWaterData();
+                renderWaterGlasses();
+                updateWaterCounter();
+            }
+        }
+
+        function removeWater() {
+            const today = getTodayString();
+            if (waterData[today] > 0) {
+                waterData[today]--;
+                saveWaterData();
+                renderWaterGlasses();
+                updateWaterCounter();
+            }
+        }
+
+        function resetWater() {
+            if (confirm('לאפס את ספירת המים?')) {
+                const today = getTodayString();
+                waterData[today] = 0;
+                saveWaterData();
+                renderWaterGlasses();
+                updateWaterCounter();
+            }
+        }
+
+        function updateWaterCounter() {
+            const today = getTodayString();
+            document.getElementById('waterCount').textContent = waterData[today] || 0;
+        }
+
+        function updateWaterGoal() {
+            waterGoal = parseInt(document.getElementById('waterGoalInput').value) || 8;
+            document.getElementById('waterGoalDisplay').textContent = waterGoal;
+            localStorage.setItem('waterGoal', waterGoal);
+            renderWaterGlasses();
+        }
+
+        function saveWaterData() {
+            localStorage.setItem('waterData', JSON.stringify(waterData));
+        }
+
+        function loadWaterData() {
+            const saved = localStorage.getItem('waterData');
+            if (saved) {
+                waterData = JSON.parse(saved);
+            }
+            const savedGoal = localStorage.getItem('waterGoal');
+            if (savedGoal) {
+                waterGoal = parseInt(savedGoal);
+                document.getElementById('waterGoalInput').value = waterGoal;
+                document.getElementById('waterGoalDisplay').textContent = waterGoal;
+            }
+        }
+
+        function loadData() {
+            const savedMeals = localStorage.getItem('foodDiary');
+            if (savedMeals) {
+                meals = JSON.parse(savedMeals);
+            }
+            
+            const savedGoals = localStorage.getItem('goals');
+            if (savedGoals) {
+                goals = JSON.parse(savedGoals);
+                document.getElementById('calorieGoal').value = goals.calories;
+                document.getElementById('proteinGoal').value = goals.protein;
+                if (goals.carbs) {
+                    document.getElementById('carbsGoal').value = goals.carbs;
+                }
+                if (goals.fat) {
+                    document.getElementById('fatGoal').value = goals.fat;
+                }
+                if (goals.weight) {
+                    document.getElementById('weightGoal').value = goals.weight;
+                }
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('foodDiary', JSON.stringify(meals));
+        }
+
+        function saveGoals() {
+            goals.calories = parseInt(document.getElementById('calorieGoal').value) || 2000;
+            goals.protein = parseInt(document.getElementById('proteinGoal').value) || 150;
+            goals.carbs = parseInt(document.getElementById('carbsGoal').value) || 200;
+            goals.fat = parseInt(document.getElementById('fatGoal').value) || 65;
+            goals.weight = parseFloat(document.getElementById('weightGoal').value) || null;
+            localStorage.setItem('goals', JSON.stringify(goals));
+            updateStats();
+        }
+
+        function getTodayString() {
+            const today = new Date();
+            return today.toISOString().split('T')[0];
+        }
+
+        function displayDate() {
+            const options = { weekday: 'long', day: 'numeric', month: 'long' };
+            const today = new Date();
+            document.getElementById('dateDisplay').textContent = today.toLocaleDateString('he-IL', options);
+        }
+
+        function addMeal() {
+            const mealType = document.getElementById('mealType').value;
+            const mealName = document.getElementById('mealName').value;
+            const calories = parseFloat(document.getElementById('calories').value) || 0;
+            const protein = parseFloat(document.getElementById('protein').value) || 0;
+            const carbs = parseFloat(document.getElementById('carbs').value) || 0;
+            const fat = parseFloat(document.getElementById('fat').value) || 0;
+            const notes = document.getElementById('notes').value;
+
+            if (!mealName) {
+                alert('נא להזין שם מנה');
+                return;
+            }
+
+            // Check if we're editing an existing meal
+            const editingId = document.getElementById('editingMealId');
+            const editingDate = document.getElementById('editingMealDate');
+            
+            const targetDate = (editingDate && editingDate.value) ? editingDate.value : getTodayString();
+            
+            if (!meals[targetDate]) {
+                meals[targetDate] = [];
+            }
+
+            if (editingId && editingId.value) {
+                // Update existing meal
+                const mealIndex = meals[targetDate].findIndex(m => m.id == editingId.value);
+                if (mealIndex !== -1) {
+                    meals[targetDate][mealIndex] = {
+                        id: parseInt(editingId.value),
+                        type: mealType,
+                        name: mealName,
+                        calories: calories,
+                        protein: protein,
+                        carbs: carbs,
+                        fat: fat,
+                        notes: notes,
+                        time: meals[targetDate][mealIndex].time // Keep original time
+                    };
+                }
+                editingId.value = ''; // Clear editing mode
+                if (editingDate) editingDate.value = '';
+                document.querySelector('.card h2').textContent = '➕ הוספת ארוחה';
+                document.querySelector('.btn').textContent = 'הוסף ארוחה 🍽️';
+            } else {
+                // Add new meal
+                const meal = {
+                    id: Date.now(),
+                    type: mealType,
+                    name: mealName,
+                    calories: calories,
+                    protein: protein,
+                    carbs: carbs,
+                    fat: fat,
+                    notes: notes,
+                    time: new Date().toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })
+                };
+                meals[targetDate].push(meal);
+            }
+
+            saveData();
+            clearForm();
+            displayMeals();
+            updateStats();
+        }
+
+        function editMeal(mealId) {
+            const today = getTodayString();
+            const meal = meals[today].find(m => m.id === mealId);
+            
+            if (!meal) return;
+
+            // Fill form with meal data
+            document.getElementById('mealType').value = meal.type;
+            document.getElementById('mealName').value = meal.name;
+            document.getElementById('calories').value = meal.calories;
+            document.getElementById('protein').value = meal.protein;
+            document.getElementById('carbs').value = meal.carbs;
+            document.getElementById('fat').value = meal.fat;
+            document.getElementById('notes').value = meal.notes;
+
+            // Store the meal ID being edited
+            let editingIdInput = document.getElementById('editingMealId');
+            if (!editingIdInput) {
+                editingIdInput = document.createElement('input');
+                editingIdInput.type = 'hidden';
+                editingIdInput.id = 'editingMealId';
+                document.body.appendChild(editingIdInput);
+            }
+            editingIdInput.value = mealId;
+
+            // Update button text
+            document.querySelector('.card h2').textContent = '✏️ עריכת ארוחה';
+            document.querySelector('.btn').textContent = 'שמור שינויים ✅';
+
+            // Scroll to form
+            document.querySelector('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function editHistoryMeal(date, mealId) {
+            const meal = meals[date].find(m => m.id === mealId);
+            
+            if (!meal) return;
+
+            // Fill form with meal data
+            document.getElementById('mealType').value = meal.type;
+            document.getElementById('mealName').value = meal.name;
+            document.getElementById('calories').value = meal.calories;
+            document.getElementById('protein').value = meal.protein;
+            document.getElementById('carbs').value = meal.carbs;
+            document.getElementById('fat').value = meal.fat;
+            document.getElementById('notes').value = meal.notes;
+
+            // Store the meal ID and date being edited
+            let editingIdInput = document.getElementById('editingMealId');
+            if (!editingIdInput) {
+                editingIdInput = document.createElement('input');
+                editingIdInput.type = 'hidden';
+                editingIdInput.id = 'editingMealId';
+                document.body.appendChild(editingIdInput);
+            }
+            editingIdInput.value = mealId;
+
+            let editingDateInput = document.getElementById('editingMealDate');
+            if (!editingDateInput) {
+                editingDateInput = document.createElement('input');
+                editingDateInput.type = 'hidden';
+                editingDateInput.id = 'editingMealDate';
+                document.body.appendChild(editingDateInput);
+            }
+            editingDateInput.value = date;
+
+            // Update button text
+            document.querySelector('.card h2').textContent = '✏️ עריכת ארוחה';
+            document.querySelector('.btn').textContent = 'שמור שינויים ✅';
+
+            // Switch to today tab and scroll to form
+            switchTab('today');
+            setTimeout(() => {
+                document.querySelector('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+
+        function deleteHistoryMeal(date, mealId) {
+            if (!confirm('למחוק ארוחה זו?')) {
+                return;
+            }
+
+            meals[date] = meals[date].filter(meal => meal.id !== mealId);
+            saveData();
+            loadHistory();
+            updateStats();
+        }
+
+        function clearForm() {
+            document.getElementById('mealName').value = '';
+            document.getElementById('calories').value = '';
+            document.getElementById('protein').value = '';
+            document.getElementById('carbs').value = '';
+            document.getElementById('fat').value = '';
+            document.getElementById('notes').value = '';
+            
+            // Clear editing mode
+            const editingId = document.getElementById('editingMealId');
+            if (editingId) {
+                editingId.value = '';
+            }
+            
+            const editingDate = document.getElementById('editingMealDate');
+            if (editingDate) {
+                editingDate.value = '';
+            }
+            
+            // Reset form title and button
+            document.querySelector('.card h2').textContent = '➕ הוספת ארוחה';
+            document.querySelector('.btn').textContent = 'הוסף ארוחה 🍽️';
+        }
+
+        function displayMeals() {
+            const today = getTodayString();
+            const mealList = document.getElementById('mealList');
+            const todayMeals = meals[today] || [];
+
+            if (todayMeals.length === 0) {
+                mealList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🍽️</div>
+                        <p>עדיין לא הוספת ארוחות</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            const mealTypeNames = {
+                breakfast: 'ארוחת בוקר',
+                lunch: 'ארוחת צהריים',
+                dinner: 'ארוחת ערב',
+                snack: 'חטיף'
+            };
+
+            todayMeals.forEach(meal => {
+                const displayCalories = meal.calories % 1 === 0 ? meal.calories : meal.calories.toFixed(1);
+                const displayProtein = meal.protein % 1 === 0 ? meal.protein : meal.protein.toFixed(1);
+                const displayCarbs = meal.carbs % 1 === 0 ? meal.carbs : meal.carbs.toFixed(1);
+                const displayFat = meal.fat % 1 === 0 ? meal.fat : meal.fat.toFixed(1);
+                
+                html += `
+                    <div class="meal-item">
+                        <div class="meal-type-badge ${meal.type}">${mealTypeNames[meal.type]}</div>
+                        <div class="meal-time">${meal.time}</div>
+                        <h3>${meal.name}</h3>
+                        <div class="meal-details">
+                            <span>🔥 ${displayCalories} קלוריות</span>
+                            <span>💪 ${displayProtein}g חלבון</span>
+                            <span>🍞 ${displayCarbs}g פחמימות</span>
+                            <span>🥑 ${displayFat}g שומן</span>
+                        </div>
+                        ${meal.notes ? `<p style="margin-top: 8px; color: #9b8574; font-size: 0.85em;">📝 ${meal.notes}</p>` : ''}
+                        <div class="meal-buttons">
+                            <button class="edit-btn" onclick="editMeal(${meal.id})">✏️ ערוך</button>
+                            <button class="delete-btn" onclick="deleteMeal(${meal.id})">🗑️ מחק</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            mealList.innerHTML = html;
+        }
+
+        function deleteMeal(mealId) {
+            if (!confirm('למחוק ארוחה זו?')) {
+                return;
+            }
+
+            const today = getTodayString();
+            meals[today] = meals[today].filter(meal => meal.id !== mealId);
+            saveData();
+            displayMeals();
+            updateStats();
+        }
+
+        function updateStats() {
+            const today = getTodayString();
+            const todayMeals = meals[today] || [];
+
+            let totalCalories = 0;
+            let totalProtein = 0;
+            let totalCarbs = 0;
+            let totalFat = 0;
+
+            todayMeals.forEach(meal => {
+                totalCalories += meal.calories;
+                totalProtein += meal.protein;
+                totalCarbs += meal.carbs;
+                totalFat += meal.fat;
+            });
+
+            // Update with animation and format numbers
+            const caloriesEl = document.getElementById('totalCalories');
+            const proteinEl = document.getElementById('totalProtein');
+            const carbsEl = document.getElementById('totalCarbs');
+            const fatEl = document.getElementById('totalFat');
+
+            caloriesEl.textContent = totalCalories % 1 === 0 ? totalCalories : totalCalories.toFixed(1);
+            proteinEl.textContent = totalProtein % 1 === 0 ? totalProtein : totalProtein.toFixed(1);
+            carbsEl.textContent = totalCarbs % 1 === 0 ? totalCarbs : totalCarbs.toFixed(1);
+            fatEl.textContent = totalFat % 1 === 0 ? totalFat : totalFat.toFixed(1);
+
+            // Add pulse animation
+            [caloriesEl, proteinEl, carbsEl, fatEl].forEach(el => {
+                el.classList.add('updated');
+                setTimeout(() => el.classList.remove('updated'), 500);
+            });
+        }
+
+        function switchTab(tabName) {
+            const tabs = document.querySelectorAll('.card > .tabs .tab');
+            const contents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => tab.classList.remove('active'));
+            contents.forEach(content => content.classList.remove('active'));
+
+            if (tabName === 'today') {
+                tabs[0].classList.add('active');
+                document.getElementById('todayTab').classList.add('active');
+            } else {
+                tabs[1].classList.add('active');
+                document.getElementById('historyTab').classList.add('active');
+                loadFullHistoryTable();
+            }
+        }
+
+        function switchHistoryView(viewType) {
+            const historyTabs = document.querySelectorAll('#historyTab .tabs .tab');
+            const views = document.querySelectorAll('.history-view');
+
+            historyTabs.forEach(tab => tab.classList.remove('active'));
+            views.forEach(view => view.classList.remove('active'));
+
+            if (viewType === 'date') {
+                historyTabs[0].classList.add('active');
+                document.getElementById('dateHistoryView').classList.add('active');
+            } else {
+                historyTabs[1].classList.add('active');
+                document.getElementById('tableHistoryView').classList.add('active');
+                loadFullHistoryTable();
+            }
+        }
+
+        function loadFullHistoryTable() {
+            const tbody = document.getElementById('historyTableBody');
+            
+            const allDates = new Set([...Object.keys(meals), ...Object.keys(waterData)]);
+            const sortedDates = Array.from(allDates).sort().reverse();
+
+            if (sortedDates.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 30px;">
+                            <div style="font-size: 2em;">📊</div>
+                            <div>טרם נרשמו נתונים</div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            let html = '';
+            let totalCalories = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0, totalWater = 0, totalMeals = 0;
+
+            sortedDates.forEach(date => {
+                const dateMeals = meals[date] || [];
+                const dateWater = waterData[date] || 0;
+
+                let dayCalories = 0, dayProtein = 0, dayCarbs = 0, dayFat = 0;
+
+                dateMeals.forEach(meal => {
+                    dayCalories += meal.calories;
+                    dayProtein += meal.protein;
+                    dayCarbs += meal.carbs;
+                    dayFat += meal.fat;
+                });
+
+                totalCalories += dayCalories;
+                totalProtein += dayProtein;
+                totalCarbs += dayCarbs;
+                totalFat += dayFat;
+                totalWater += dateWater;
+                totalMeals += dateMeals.length;
+
+                const dateObj = new Date(date + 'T00:00:00');
+                const formattedDate = dateObj.toLocaleDateString('he-IL', { 
+                    day: 'numeric', 
+                    month: 'short'
+                });
+
+                const displayCalories = dayCalories % 1 === 0 ? dayCalories : dayCalories.toFixed(1);
+                const displayProtein = dayProtein % 1 === 0 ? dayProtein : dayProtein.toFixed(1);
+                const displayCarbs = dayCarbs % 1 === 0 ? dayCarbs : dayCarbs.toFixed(1);
+                const displayFat = dayFat % 1 === 0 ? dayFat : dayFat.toFixed(1);
+
+                html += `
+                    <tr>
+                        <td class="date-cell">${formattedDate}</td>
+                        <td data-label="קלוריות">${displayCalories}</td>
+                        <td data-label="חלבון">${displayProtein}g</td>
+                        <td data-label="פחמימות">${displayCarbs}g</td>
+                        <td data-label="שומן">${displayFat}g</td>
+                        <td data-label="מים" class="water-cell">${dateWater} 💧</td>
+                        <td data-label="ארוחות">${dateMeals.length}</td>
+                    </tr>
+                `;
+            });
+
+            const avgCalories = totalCalories / sortedDates.length;
+            const avgProtein = totalProtein / sortedDates.length;
+            const avgCarbs = totalCarbs / sortedDates.length;
+            const avgFat = totalFat / sortedDates.length;
+            const avgWater = Math.round(totalWater / sortedDates.length);
+
+            const displayTotalCal = totalCalories % 1 === 0 ? totalCalories : totalCalories.toFixed(1);
+            const displayTotalPro = totalProtein % 1 === 0 ? totalProtein : totalProtein.toFixed(1);
+            const displayTotalCarbs = totalCarbs % 1 === 0 ? totalCarbs : totalCarbs.toFixed(1);
+            const displayTotalFat = totalFat % 1 === 0 ? totalFat : totalFat.toFixed(1);
+
+            const displayAvgCal = avgCalories % 1 === 0 ? Math.round(avgCalories) : avgCalories.toFixed(1);
+            const displayAvgPro = avgProtein % 1 === 0 ? Math.round(avgProtein) : avgProtein.toFixed(1);
+            const displayAvgCarbs = avgCarbs % 1 === 0 ? Math.round(avgCarbs) : avgCarbs.toFixed(1);
+            const displayAvgFat = avgFat % 1 === 0 ? Math.round(avgFat) : avgFat.toFixed(1);
+
+            html += `
+                <tr class="summary-row">
+                    <td>סה"כ (${sortedDates.length} ימים)</td>
+                    <td data-label="קלוריות">${displayTotalCal}</td>
+                    <td data-label="חלבון">${displayTotalPro}g</td>
+                    <td data-label="פחמימות">${displayTotalCarbs}g</td>
+                    <td data-label="שומן">${displayTotalFat}g</td>
+                    <td data-label="מים" class="water-cell">${totalWater} 💧</td>
+                    <td data-label="ארוחות">${totalMeals}</td>
+                </tr>
+                <tr class="summary-row">
+                    <td>ממוצע יומי</td>
+                    <td data-label="קלוריות">${displayAvgCal}</td>
+                    <td data-label="חלבון">${displayAvgPro}g</td>
+                    <td data-label="פחמימות">${displayAvgCarbs}g</td>
+                    <td data-label="שומן">${displayAvgFat}g</td>
+                    <td data-label="מים" class="water-cell">${avgWater} 💧</td>
+                    <td data-label="ארוחות">${Math.round(totalMeals / sortedDates.length)}</td>
+                </tr>
+            `;
+
+            tbody.innerHTML = html;
+        }
+
+        function loadHistory() {
+            const selectedDate = document.getElementById('historyDate').value;
+            const historyList = document.getElementById('historyList');
+
+            if (!selectedDate) {
+                historyList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📅</div>
+                        <p>בחר תאריך</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const dateMeals = meals[selectedDate] || [];
+
+            if (dateMeals.length === 0) {
+                historyList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">❌</div>
+                        <p>אין ארוחות בתאריך זה</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let totalCalories = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0;
+
+            dateMeals.forEach(meal => {
+                totalCalories += meal.calories;
+                totalProtein += meal.protein;
+                totalCarbs += meal.carbs;
+                totalFat += meal.fat;
+            });
+
+            const displayCalories = totalCalories % 1 === 0 ? totalCalories : totalCalories.toFixed(1);
+            const displayProtein = totalProtein % 1 === 0 ? totalProtein : totalProtein.toFixed(1);
+            const displayCarbs = totalCarbs % 1 === 0 ? totalCarbs : totalCarbs.toFixed(1);
+
+            let html = `
+                <div class="macro-breakdown">
+                    <div class="macro-item">
+                        <h4>קלוריות</h4>
+                        <div class="value">${displayCalories}</div>
+                    </div>
+                    <div class="macro-item">
+                        <h4>חלבון</h4>
+                        <div class="value">${displayProtein}g</div>
+                    </div>
+                    <div class="macro-item">
+                        <h4>פחמימות</h4>
+                        <div class="value">${displayCarbs}g</div>
+                    </div>
+                </div>
+                <div style="margin-top: 15px;"></div>
+            `;
+
+            const mealTypeNames = {
+                breakfast: 'ארוחת בוקר',
+                lunch: 'ארוחת צהריים',
+                dinner: 'ארוחת ערב',
+                snack: 'חטיף'
+            };
+
+            dateMeals.forEach(meal => {
+                const displayCalories = meal.calories % 1 === 0 ? meal.calories : meal.calories.toFixed(1);
+                const displayProtein = meal.protein % 1 === 0 ? meal.protein : meal.protein.toFixed(1);
+                const displayCarbs = meal.carbs % 1 === 0 ? meal.carbs : meal.carbs.toFixed(1);
+                const displayFat = meal.fat % 1 === 0 ? meal.fat : meal.fat.toFixed(1);
+                
+                html += `
+                    <div class="meal-item">
+                        <div class="meal-type-badge ${meal.type}">${mealTypeNames[meal.type]}</div>
+                        <div class="meal-time">${meal.time}</div>
+                        <h3>${meal.name}</h3>
+                        <div class="meal-details">
+                            <span>🔥 ${displayCalories}</span>
+                            <span>💪 ${displayProtein}g</span>
+                            <span>🍞 ${displayCarbs}g</span>
+                            <span>🥑 ${displayFat}g</span>
+                        </div>
+                        ${meal.notes ? `<p style="margin-top: 8px; color: #9b8574; font-size: 0.85em;">📝 ${meal.notes}</p>` : ''}
+                        <div class="meal-buttons">
+                            <button class="edit-btn" onclick="editHistoryMeal('${selectedDate}', ${meal.id})">✏️ ערוך</button>
+                            <button class="delete-btn" onclick="deleteHistoryMeal('${selectedDate}', ${meal.id})">🗑️ מחק</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            historyList.innerHTML = html;
+        }
+
+        loadData();
+        loadWaterData();
+        displayDate();
+        displayRandomQuote();
+        displayMeals();
+        updateStats();
+        initWaterTracker();
+    </script>
+</body>
+</html>
